@@ -95,7 +95,7 @@ training = results.sample(frac=0.8, random_state=1)
 testing = results.loc[~results.index.isin(train.index)]
 
 #### 2.2.2 R Training & Test
-
+```
 ``` R
 train_count <- floor(0.8 * nrow(results))
 set.seed(1)
