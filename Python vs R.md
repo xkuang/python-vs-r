@@ -21,7 +21,7 @@ To get the most out of this tutorial, some basic understanding of machine learni
         * [2.1.2 Viewing the Data](#212-viewing-the-data)
         * [2.2.3 Simple Stats](#213-simple-stats)
     + [2.2 Splitting the Data](#22-splitting-the-data)
-- [3.0 Plotting](#30-plotting)
+- [3.0 Data Visualization](#30-data-visualization)
     + [3.1 Scatter Plots](#31-scatter-plots)
         * [3.1.1 Python ggplot](#311-python-ggplot)
         * [3.1.2 R ggplot](#312-r-ggplot)
@@ -54,15 +54,19 @@ Download [R](https://www.r-project.org/) and [R Studio](https://www.rstudio.com/
 
 ### 0.3 Other
 
-```
-pip install pandas
-pip install sklearn
-pip install seaborn
+``` R
+install.packages('dplyr')
+install.packages('data.table')
+install.packages('lubridate')
+install.packages('jsonlite')
+install.packages('tidyr')
+install.packages('ggplot2')
+install.packages('compare')
 ```
 
 ## 1.0 Introduction
 
-Python and R are two commonly used programming languages in the realm of data science. Some data scientists prefer R, others prefer R; regardless, both are useful programming languages to feel comfortable with if you're interested in Data Science. With that said, in this tutorial we'll go through a data analysis problem in both languages, making sure to highlight differences between the two languages. 
+Python and R are two commonly used programming languages in the realm of data science. Some data scientists prefer R, others prefer Python; regardless, both are useful programming languages to feel comfortable with if you're interested in Data Science. With that said, in this tutorial we'll go through data analysis problems in both languages, making sure to highlight differences between the two languages. 
 
 ### 1.1 The Data 
 
@@ -143,11 +147,45 @@ index <- sample(1:nrow(results), train_count)
 training <- results[index,]
 testing <- results[-index,]
 ```
-## 3.0 Plotting
 
-### 3.1 Scatter Plots
+## 3.0 Data Visualization
 
-#### 3.1.1 Python ggplot
+### 3.1 
+
+```python
+from ggplot.exampledata import diamonds
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+sns.set_style("white")
+sns.lmplot("carat", "price", col="cut", data=diamonds, order=2)
+```
+And as usual, to show the visualization, enter:
+``` python
+plt.show()
+```
+
+If your data analysis needs integration with a web application or database, Python is probably your best bet. Compared to R, the support for these sorts of application is much better since it's more of a general-purpose language.
+
+Whereas in R, you can do the exact same thing with these lines of code:
+
+```R
+library(ggplot2)
+library(dplyr)
+data(diamonds)
+diamonds %>% 
+ggplot(aes(x=carat,y=price)) + 
+geom_point(alpha=0.5) +
+facet_grid(~ cut) + 
+stat_smooth(method = lm, formula = y ~ poly(x,2)) + 
+theme_bw()
+```
+
+Meanwhile, if your data analysis demands standalone computing or exploratory work, R is a great choice because of its strong statistical support.
+
+### 3.2 Scatter Plots
+
+#### 3.2.1 Python ggplot
 
 ``` python 
 from ggplot.exampledata import diamonds
@@ -159,26 +197,137 @@ sn.lmplot("carat","price",col="cut",data=diamonds, order=2)
 sn.plt.show()
 ```
 
-#### 3.1.2 R ggplot2
+#### 4.2.2 R ggplot2
 
 ``` R
 library(ggplot2)
 library(dplyr)
 data(diamonds)
 diamonds %>$
-    ggplot(aes(x=carat,y=price)) + 
-    geom_point(alpha=0.5) + facet_grid(~ cut) +
-    stat_smooth(method=lm,formula=y ~ ploy(x,2)) + theme_bw()
+ggplot(aes(x=carat,y=price)) + 
+geom_point(alpha=0.5) + facet_grid(~ cut) +
+stat_smooth(method=lm,formula=y ~ ploy(x,2)) + theme_bw()
 ```
 
 Notice that these visualizations have a much better scaling of the y-axis; this is because R automatically scales to the actual data rather than the model fit. 
 
 
-### 3.2 Clustering 
+## 4.0 Analysis
 
-### 3.3 Random Forests
+### 4.1 Time Series
 
-## 4.0 Error Evaluation
+As always, let's import the needed modules first. 
+
+``` python
+import matplotlib.pyplot as plt
+import pandas as pd
+import numpy as np
+import seaborn as sns
+```
+
+Every data visualization is going to be customized to your liking, in terms of aesthetic. Here, we feed in the specifics of how our time series graph should look. 
+
+``` python
+sns.set()
+sns.set_context('notebook', font_scale=1.5)
+cp = sns.color_palette()
+```
+
+In this example, we'll be creating a random time series -- here we'll load in the data with pandas. 
+
+``` python
+ts = pd.read_csv('./ts.csv')
+```
+
+Here we cast our data to datetimes so we can make a timeseries plot.
+
+``` python
+ts = ts.assign(dt = pd.to_datetime(ts.dt))
+```
+
+The FacetGrid is an object that links a Pandas DataFrame to a matplotlib figure with a particular structure. Here, we're just initializing it. 
+
+``` python
+g = sns.FacetGrid(ts, hue='kind', size=5, aspect=1.5)
+```
+
+Using the map() function, we plot each subset and give it the final aesthetic details. 
+
+``` python
+g.map(plt.plot, 'dt', 'value').add_legend()
+g.ax.set(xlabel='Date', ylabel='Value', title='Random Timeseries')
+g.fig.autofmt_xdate()
+```
+
+Now let's take a look!
+
+``` python
+plt.show()
+```
+
+
+``` python
+df = pd.read_csv('./iris.csv')
+```
+
+Once again, we call the FacetGrid object for our scatterplot and follow up by plotting the scatter plots with its aesthetical specifics. 
+``` python
+g = sns.FacetGrid(df, hue='species', size=7.5)
+g.map(plt.scatter, 'petalLength', 'petalWidth').add_legend()
+g.ax.set_title('Petal Width v. Length -- by Species')
+```
+
+Now let's take a look! 
+
+``` python
+plt.show()
+```
+
+
+
+
+### 4.2 Clustering 
+
+### 4.3 Random Forests
+
+``` python
+import numpy as np
+import pylab as pl
+
+x = np.random.uniform(1, 100, 1000)
+y = np.log(x) + np.random.normal(0, .3, 1000)
+
+pl.scatter(x, y, s=1, label="log(x) with noise")
+pl.plot(np.arange(1, 100), np.log(np.arange(1, 100)), c="b", label="log(x) true function")
+pl.xlabel("x")
+pl.ylabel("f(x) = log(x)")
+pl.legend(loc="best")
+pl.title("A Basic Log Function")
+pl.show() 
+```
+
+``` python
+from sklearn.datasets import load_iris
+from sklearn.ensemble import RandomForestClassifier
+import pandas as pd
+import numpy as np
+
+iris = load_iris()
+df = pd.DataFrame(iris.data, columns=iris.feature_names)
+df['is_train'] = np.random.uniform(0, 1, len(df)) <= .75
+df['species'] = pd.Categorical.from_codes(iris.target, iris.target_names)
+df.head()
+
+train, test = df[df['is_train']==True], df[df['is_train']==False]
+
+features = df.columns[:4]
+clf = RandomForestClassifier(n_jobs=2)
+y, _ = pd.factorize(train['species'])
+clf.fit(train[features], y)
+
+preds = iris.target_names[clf.predict(test[features])]
+pd.crosstab(test['species'], preds, rownames=['actual'], colnames=['preds'])
+```
 
 ## 5.0 Differences Overview
 
