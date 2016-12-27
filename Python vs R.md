@@ -164,12 +164,17 @@ Notice that R has more data analysis focused builtins, like floor, sample, and s
 
 ## 3.0 Data Visualizations
 
+<<<<<<< HEAD
 ### 3.1 Pairwise Scatterplots
 
 One common way to explore a dataset is to see how different columns correlate to others. We’ll compare the ast, fg, and trb columns.
 
 In R, we'll do this using the GGally package.
 
+=======
+#### 2.2.2 R Training & Test
+```
+>>>>>>> 2f2993b4e7befff0c62ffbda8029a5fe874efbf8
 ``` R
 library(GGally)
 ggpairs(nba[,c("ast", "fg", "trb")])
